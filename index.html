@@ -3,525 +3,389 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Огненный куб: Идеальный баланс | Точные прыжки</title>
+    <title>Дерево — нарисовано через Canvas</title>
     <style>
-        body {
+        * {
             margin: 0;
-            overflow: hidden;
-            font-family: 'Segoe UI', 'Orbitron', 'Courier New', monospace;
-            background-color: #03050b;
-            color: white;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .ui-panel {
-            position: absolute;
-            top: 20px;
-            left: 0;
-            width: 100%;
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #c8e8ff 0%, #a0d0f0 100%);
             display: flex;
             justify-content: center;
-            gap: 45px;
-            z-index: 20;
-            pointer-events: none;
-            text-shadow: 0 0 6px black;
+            align-items: center;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            padding: 20px;
         }
-        .score-card, .best-card {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(12px);
-            padding: 6px 22px;
-            border-radius: 50px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            border-bottom: 3px solid #ff8844;
-            font-family: monospace;
-        }
-        .score-card span, .best-card span {
-            color: #ffaa55;
-            font-size: 1.9rem;
-            margin-left: 10px;
-        }
-        .start-panel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(8, 12, 24, 0.96);
-            backdrop-filter: blur(16px);
+
+        .container {
+            background: #7cb56e;
+            background-image: radial-gradient(circle at 25% 40%, rgba(100, 140, 70, 0.3) 2%, transparent 2.5%);
+            background-size: 40px 40px;
             border-radius: 48px;
-            padding: 28px 48px;
-            text-align: center;
-            z-index: 30;
-            border: 1px solid #ff8844;
-            box-shadow: 0 0 55px rgba(255, 68, 0, 0.6);
-            pointer-events: auto;
-            min-width: 280px;
+            padding: 30px 40px 40px 40px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.3), inset 0 1px 4px rgba(255, 255, 200, 0.6);
         }
-        .start-panel h1 {
-            margin: 0 0 8px;
-            font-size: 2.2rem;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #ffaa66, #ff4411);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .start-panel p {
-            margin: 8px 0;
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        .start-btn {
-            background: linear-gradient(135deg, #ff6622, #ff4411);
-            border: none;
-            padding: 12px 32px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            font-family: monospace;
-            color: white;
-            border-radius: 60px;
-            margin-top: 22px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 0 18px #ff4400;
-        }
-        .start-btn:hover {
-            transform: scale(1.02);
-            background: linear-gradient(135deg, #ff8844, #ff6622);
-            box-shadow: 0 0 28px #ff6600;
-        }
-        .instruction {
-            position: absolute;
-            bottom: 18px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 13px;
-            background: rgba(0,0,0,0.55);
-            width: fit-content;
+
+        canvas {
+            display: block;
             margin: 0 auto;
-            padding: 5px 18px;
-            border-radius: 40px;
-            pointer-events: none;
-            font-family: monospace;
-            backdrop-filter: blur(4px);
-        }
-        .game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(16px);
-            border-radius: 40px;
-            padding: 26px 38px;
-            text-align: center;
-            z-index: 35;
-            border: 1px solid #ff7755;
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-            min-width: 250px;
-        }
-        .restart-btn {
-            background: #ff7744;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 60px;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 1.2rem;
+            border-radius: 32px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3), inset 0 0 0 2px rgba(255, 255, 200, 0.3);
             cursor: pointer;
+            transition: transform 0.2s ease;
+            background: #e6f7e6;
         }
-        .restart-btn:hover {
-            background: #ffaa66;
+
+        canvas:hover {
+            transform: scale(1.02);
         }
-        @media (max-width: 600px) {
-            .score-card, .best-card { font-size: 1rem; padding: 4px 14px; }
-            .score-card span, .best-card span { font-size: 1.4rem; }
-            .start-panel { padding: 18px 22px; width: 80%; }
+
+        .caption {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3e2b;
+            text-shadow: 0 1px 2px rgba(255, 245, 200, 0.8);
+            background: rgba(245, 255, 210, 0.7);
+            display: inline-block;
+            width: auto;
+            padding: 8px 24px;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            letter-spacing: 1px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #2c4a1e;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
-    <div class="ui-panel">
-        <div class="score-card">🔥 ИСКРЫ <span id="scoreValue">0</span></div>
-        <div class="best-card">🏆 РЕКОРД <span id="bestValue">0</span></div>
+<div>
+    <div class="container">
+        <canvas id="treeCanvas" width="500" height="600" style="width:500px; height:600px;"></canvas>
+        <div class="caption">🌳  ДУБ НА ПОЛЯНЕ  🌳</div>
+        <footer>🍃 нарисовано кистью Canvas | живая природа в пикселях</footer>
     </div>
-    <div class="start-panel" id="startPanel">
-        <h1>⚡ ОГНЕННЫЙ КУБ ⚡</h1>
-        <p>🎯 Точные прыжки | Широкие проходы</p>
-        <p>🖱️ КЛИК / ПРОБЕЛ — короткий взлёт</p>
-        <p>🌫️ Дым, жар, уголки пылают</p>
-        <button class="start-btn" id="startBtn">ЗАЖЕЧЬ ИГРУ 🔥</button>
-    </div>
-    <div class="game-over" id="gameOverPanel">
-        <h2>💀 ПЕПЕЛ 💀</h2>
-        <p>Твой счёт: <span id="finalScore">0</span></p>
-        <button class="restart-btn" id="restartBtn">ВОЗРОДИТЬСЯ ♻️</button>
-    </div>
-    <div class="instruction">
-        🖱️ ЛКМ / ПРОБЕЛ — плавный прыжок | Гравитация мягкая | Проходи сквозь огненные трубы
-    </div>
+</div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
-            }
-        }
-    </script>
+<script>
+    (function drawBeautifulTree() {
+        const canvas = document.getElementById('treeCanvas');
+        const ctx = canvas.getContext('2d');
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+        // размеры холста
+        const w = 500, h = 600;
+        canvas.width = w;
+        canvas.height = h;
 
-        // --- СЦЕНА И КАМЕРА ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x03050b);
-        scene.fog = new THREE.FogExp2(0x03050b, 0.01);
-        const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1.0, 6.2);
-        camera.lookAt(0, 0.6, 0);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
-        const labelRenderer = new CSS2DRenderer();
-        labelRenderer.setSize(window.innerWidth, window.innerHeight);
-        labelRenderer.domElement.style.position = 'absolute';
-        labelRenderer.domElement.style.top = '0px';
-        labelRenderer.domElement.style.left = '0px';
-        labelRenderer.domElement.style.pointerEvents = 'none';
-        document.body.appendChild(labelRenderer.domElement);
+        // ----- 1. НЕБО И ТРАВА (фон) -----
+        // нежный градиент неба
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.55);
+        skyGrad.addColorStop(0, '#d4eefe');
+        skyGrad.addColorStop(0.7, '#f0f9e8');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, h);
 
-        // --- ОСВЕЩЕНИЕ ---
-        const ambient = new THREE.AmbientLight(0x332222);
-        scene.add(ambient);
-        const mainLight = new THREE.DirectionalLight(0xffccaa, 1.1);
-        mainLight.position.set(2.5, 4, 2.5);
-        mainLight.castShadow = true;
-        scene.add(mainLight);
-        const backLight = new THREE.PointLight(0x5577bb, 0.5);
-        backLight.position.set(-1.5, 1.5, -3);
-        scene.add(backLight);
-        const firePulse = new THREE.PointLight(0xff5500, 0.85);
-        firePulse.position.set(0, -0.3, 0);
-        scene.add(firePulse);
+        // земля / травяной покров
+        ctx.fillStyle = '#6c9e4a';
+        ctx.beginPath();
+        ctx.rect(0, h * 0.62, w, h * 0.38);
+        ctx.fill();
+        // травянистые мазки
+        ctx.fillStyle = '#7fb15a';
+        for (let i = 0; i < 180; i++) {
+            ctx.beginPath();
+            const x = Math.random() * w;
+            const y = h * 0.6 + Math.random() * (h * 0.35);
+            ctx.ellipse(x, y, 3 + Math.random() * 8, 1.5 + Math.random() * 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // светлые травинки
+        ctx.fillStyle = '#c0e08a';
+        for (let i = 0; i < 120; i++) {
+            ctx.beginPath();
+            const x = Math.random() * w;
+            const y = h * 0.64 + Math.random() * (h * 0.3);
+            ctx.ellipse(x, y, 2 + Math.random() * 6, 1 + Math.random() * 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
-        // --- ИГРОК: КУБ С УГОЛЬКАМИ ---
-        const cubeSize = 0.7;
-        const boxGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
-        const redMat = new THREE.MeshStandardMaterial({ color: 0xff5533, emissive: 0x441100, metalness: 0.75, roughness: 0.3 });
-        const orangeMat = new THREE.MeshStandardMaterial({ color: 0xff7744, emissive: 0x331100, metalness: 0.7 });
-        const materialsCube = [orangeMat, orangeMat, orangeMat, orangeMat, redMat, orangeMat];
-        const player = new THREE.Mesh(boxGeo, materialsCube);
-        player.castShadow = true;
-        scene.add(player);
-        
-        // Каркас ребер
-        const edgesGeo = new THREE.EdgesGeometry(boxGeo);
-        const wireframe = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: 0xffaa77 }));
-        player.add(wireframe);
-        
-        // 8 угловых огней
-        const half = cubeSize / 2;
-        const cornerPositions = [
-            [-half, half, half], [ half, half, half], [-half, half,-half], [ half, half,-half],
-            [-half,-half, half], [ half,-half, half], [-half,-half,-half], [ half,-half,-half]
-        ];
-        const cornerLights = [];
-        cornerPositions.forEach(pos => {
-            const light = new THREE.PointLight(0xff4400, 0.7, 1.4);
-            light.position.set(pos[0], pos[1], pos[2]);
-            player.add(light);
-            cornerLights.push(light);
-        });
+        // ----- 2. СТВОЛ (реалистичная кора) -----
+        const trunkX = w / 2;
+        const trunkBottomY = h * 0.78;
+        const trunkTopY = h * 0.42;
+        const trunkWidthBase = 58;
+        const trunkWidthTop = 34;
 
-        // --- ДЫМНАЯ АТМОСФЕРА (летучие частицы) ---
-        const particleCnt = 700;
-        const particleGeo = new THREE.BufferGeometry();
-        const particlePositions = new Float32Array(particleCnt * 3);
-        for (let i = 0; i < particleCnt; i++) {
-            particlePositions[i*3] = (Math.random() - 0.5) * 7.5;
-            particlePositions[i*3+1] = (Math.random() - 0.5) * 5.5;
-            particlePositions[i*3+2] = (Math.random() - 0.5) * 9 - 2;
+        // тень под деревом
+        ctx.fillStyle = '#426d2e';
+        ctx.beginPath();
+        ctx.ellipse(trunkX, trunkBottomY + 6, 52, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#2b5620';
+        ctx.beginPath();
+        ctx.ellipse(trunkX + 4, trunkBottomY + 8, 40, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // основной ствол (коричневый градиент)
+        const trunkGrad = ctx.createLinearGradient(trunkX - 25, trunkTopY, trunkX + 25, trunkBottomY);
+        trunkGrad.addColorStop(0, '#8b5a2b');
+        trunkGrad.addColorStop(0.5, '#aa6e3a');
+        trunkGrad.addColorStop(1, '#7a481f');
+        ctx.fillStyle = trunkGrad;
+
+        ctx.beginPath();
+        ctx.moveTo(trunkX - trunkWidthBase/2, trunkBottomY);
+        ctx.quadraticCurveTo(trunkX - 20, trunkBottomY - 40, trunkX - trunkWidthTop/2, trunkTopY);
+        ctx.lineTo(trunkX + trunkWidthTop/2, trunkTopY);
+        ctx.quadraticCurveTo(trunkX + 20, trunkBottomY - 40, trunkX + trunkWidthBase/2, trunkBottomY);
+        ctx.fill();
+
+        // текстура коры (вертикальные линии и пятна)
+        ctx.save();
+        ctx.globalCompositeOperation = 'overlay';
+        ctx.beginPath();
+        ctx.strokeStyle = '#5c381a';
+        ctx.lineWidth = 2;
+        for (let i = -18; i <= 18; i += 5) {
+            ctx.beginPath();
+            ctx.moveTo(trunkX + i, trunkTopY + 12);
+            ctx.quadraticCurveTo(trunkX + i + 2, trunkTopY + 50, trunkX + i - 1, trunkBottomY - 15);
+            ctx.stroke();
         }
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-        const smokeMat = new THREE.PointsMaterial({ color: 0xaa99bb, size: 0.055, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
-        const smokeSys = new THREE.Points(particleGeo, smokeMat);
-        scene.add(smokeSys);
-        
-        // Звездное поле
-        const starCount = 1400;
-        const starGeo = new THREE.BufferGeometry();
-        const starPos = new Float32Array(starCount * 3);
-        for (let i = 0; i < starCount; i++) {
-            starPos[i*3] = (Math.random() - 0.5) * 200;
-            starPos[i*3+1] = (Math.random() - 0.5) * 40;
-            starPos[i*3+2] = (Math.random() - 0.5) * 80 - 40;
+        // сучки и кора
+        ctx.fillStyle = '#b87a42';
+        for (let s = 0; s < 35; s++) {
+            ctx.beginPath();
+            const offX = trunkX - 15 + Math.random() * 30;
+            const offY = trunkTopY + 25 + Math.random() * 90;
+            ctx.ellipse(offX, offY, 3 + Math.random() * 6, 1 + Math.random() * 3, 0, 0, Math.PI * 2);
+            ctx.fill();
         }
-        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-        const starsMat = new THREE.PointsMaterial({ color: 0xffaa88, size: 0.04, transparent: true });
-        const starsField = new THREE.Points(starGeo, starsMat);
-        scene.add(starsField);
-        
-        // --- ИГРОВАЯ ЛОГИКА: ИСПРАВЛЕННЫЕ ПРЫЖКИ (меньше сила, лучше контроль)---
-        let gameActive = false;
-        let score = 0;
-        let bestScore = localStorage.getItem('fireBestBalanced') ? parseInt(localStorage.getItem('fireBestBalanced')) : 0;
-        document.getElementById('bestValue').innerText = bestScore;
-        
-        // ФИЗИКА - ГЛАВНОЕ: прыжок стал НИЖЕ и контролируемее
-        let playerY = 0;
-        let playerVelY = 0;
-        const GRAVITY = 1;
-        const JUMP_FORCE = -0.20;      // было -0.38 / -0.45, теперь намного мягче прыжок
-        const GROUND_Y = -2.2;
-        const CEILING_Y = 2.5;
-        
-        // Объекты мира
-        let obstacles = [];
-        let sparks = [];
-        let frameCounter = 0;
-        let lastSpawnFrame = 0;
-        const SPAWN_INTERVAL = 72;      // комфортный спавн
-        const SCROLL_SPEED = 0.021;
-        
-        // --- СОЗДАНИЕ ШИРОКИХ ПРЕПЯТСТВИЙ (проход 2.5 юнита)---
-        function createObstacleWide(xPos) {
-            const group = new THREE.Group();
-            const pillarWidth = 0.78;
-            const pillarDepth = 0.72;
-            const GAP_HEIGHT = 2.55;      // очень широкий проход
-            const minCenter = -1.15;
-            const maxCenter = 1.35;
-            const passageCenter = minCenter + Math.random() * (maxCenter - minCenter);
-            const topY = passageCenter + GAP_HEIGHT/2;
-            const bottomY = passageCenter - GAP_HEIGHT/2;
-            
-            // Верхняя труба
-            const topHeight = 2.7 - topY;
-            if (topHeight > 0.2) {
-                const topPillar = new THREE.Mesh(
-                    new THREE.BoxGeometry(pillarWidth, topHeight, pillarDepth),
-                    new THREE.MeshStandardMaterial({ color: 0xaa5533, emissive: 0x331100, metalness: 0.5 })
-                );
-                topPillar.position.set(0, topY + topHeight/2, 0);
-                topPillar.castShadow = true;
-                group.add(topPillar);
-            }
-            // Нижняя труба
-            const bottomHeight = bottomY - (-2.3);
-            if (bottomHeight > 0.2) {
-                const bottomPillar = new THREE.Mesh(
-                    new THREE.BoxGeometry(pillarWidth, bottomHeight, pillarDepth),
-                    new THREE.MeshStandardMaterial({ color: 0xaa5533, emissive: 0x331100 })
-                );
-                bottomPillar.position.set(0, bottomY - bottomHeight/2, 0);
-                bottomPillar.castShadow = true;
-                group.add(bottomPillar);
-            }
-            // декоративное свечение на столбах
-            group.position.x = xPos;
-            group.userData = { gapCenter: passageCenter, gapHeight: GAP_HEIGHT };
-            scene.add(group);
-            return group;
+        ctx.restore();
+
+        // корни (выходят из основания)
+        ctx.fillStyle = '#8b5a2b';
+        ctx.beginPath();
+        ctx.moveTo(trunkX - 26, trunkBottomY - 5);
+        ctx.quadraticCurveTo(trunkX - 44, trunkBottomY + 4, trunkX - 38, trunkBottomY + 12);
+        ctx.quadraticCurveTo(trunkX - 24, trunkBottomY + 6, trunkX - 20, trunkBottomY);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(trunkX + 26, trunkBottomY - 4);
+        ctx.quadraticCurveTo(trunkX + 44, trunkBottomY + 5, trunkX + 38, trunkBottomY + 14);
+        ctx.quadraticCurveTo(trunkX + 26, trunkBottomY + 7, trunkX + 22, trunkBottomY);
+        ctx.fill();
+
+        // ----- 3. КРОНА (многослойная листва) -----
+        function drawLeafCluster(cx, cy, radiusX, radiusY, angle, color1, color2) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            const grad = ctx.createLinearGradient(-radiusX * 0.4, -radiusY * 0.3, radiusX * 0.6, radiusY * 0.5);
+            grad.addColorStop(0, color1);
+            grad.addColorStop(1, color2);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // прожилки / блики
+            ctx.fillStyle = '#d9f098';
+            ctx.beginPath();
+            ctx.ellipse(-radiusX * 0.2, -radiusY * 0.15, radiusX * 0.25, radiusY * 0.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
         }
+
+        // нижний ярус кроны (раскидистый)
+        const crownBaseY = trunkTopY - 8;
+        // большие шапки зелени
+        drawLeafCluster(trunkX - 18, crownBaseY + 15, 44, 38, -0.2, '#568f2b', '#3c7622');
+        drawLeafCluster(trunkX + 22, crownBaseY + 12, 48, 42, 0.15, '#5c9e2e', '#32701c');
+        drawLeafCluster(trunkX, crownBaseY + 5, 55, 48, 0.05, '#6aa83a', '#428a25');
+        drawLeafCluster(trunkX - 30, crownBaseY - 8, 42, 40, -0.3, '#4e9025', '#2c6e18');
+        drawLeafCluster(trunkX + 32, crownBaseY - 6, 44, 40, 0.25, '#58a52a', '#2f7a1a');
         
-        // Искра (огонек)
-        function createSpark(x, y) {
-            const sparkGroup = new THREE.Group();
-            const coreMat = new THREE.MeshStandardMaterial({ color: 0xff8800, emissive: 0xff4400, emissiveIntensity: 0.9 });
-            const core = new THREE.Mesh(new THREE.SphereGeometry(0.2, 14, 14), coreMat);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0xffaa66, transparent: true, opacity: 0.65 });
-            const glow = new THREE.Mesh(new THREE.SphereGeometry(0.34, 8, 8), glowMat);
-            sparkGroup.add(core);
-            sparkGroup.add(glow);
-            sparkGroup.position.set(x, y, 0);
-            sparkGroup.userData = { collected: false };
-            scene.add(sparkGroup);
-            return sparkGroup;
-        }
+        // средний ярус (пышный)
+        drawLeafCluster(trunkX - 12, crownBaseY - 22, 50, 46, -0.1, '#68b336', '#3f8622');
+        drawLeafCluster(trunkX + 14, crownBaseY - 26, 52, 45, 0.12, '#70be3c', '#3d8920');
+        drawLeafCluster(trunkX, crownBaseY - 35, 58, 52, 0.0, '#7bc945', '#469c28');
+        drawLeafCluster(trunkX - 24, crownBaseY - 40, 44, 42, -0.18, '#5cae2f', '#2f7c18');
+        drawLeafCluster(trunkX + 24, crownBaseY - 42, 46, 44, 0.2, '#62b534', '#32831c');
         
-        // СБРОС ИГРЫ
-        function resetGame() {
-            obstacles.forEach(obs => scene.remove(obs));
-            sparks.forEach(sp => scene.remove(sp));
-            obstacles = [];
-            sparks = [];
-            score = 0;
-            document.getElementById('scoreValue').innerText = "0";
-            playerY = 0;
-            playerVelY = 0;
-            player.position.y = 0;
-            frameCounter = 0;
-            lastSpawnFrame = 0;
-            gameActive = true;
-            document.getElementById('gameOverPanel').style.display = 'none';
-            document.getElementById('startPanel').style.display = 'none';
-            
-            // начальные объекты
-            for (let i = 0; i < 2; i++) {
-                let obs = createObstacleWide(4.0 + i * 3.4);
-                obstacles.push(obs);
-                if (Math.random() < 0.75) {
-                    let sparkY = -1.1 + Math.random() * 3.2;
-                    let sparkObj = createSpark(4.0 + i * 3.4 + 1.3, sparkY);
-                    sparks.push(sparkObj);
-                }
-            }
-            // бонусная искра рядом
-            let starterSpark = createSpark(2.2, 0.4);
-            sparks.push(starterSpark);
+        // верхушка (самая яркая)
+        drawLeafCluster(trunkX - 6, crownBaseY - 64, 48, 45, -0.05, '#7dd44a', '#4ba32c');
+        drawLeafCluster(trunkX + 8, crownBaseY - 68, 46, 44, 0.07, '#88da54', '#52ac30');
+        drawLeafCluster(trunkX, crownBaseY - 80, 44, 42, 0.0, '#95e462', '#5dbd38');
+        drawLeafCluster(trunkX - 14, crownBaseY - 85, 38, 36, -0.12, '#81d64c', '#49a528');
+        drawLeafCluster(trunkX + 12, crownBaseY - 88, 38, 36, 0.1, '#86de50', '#4aac2a');
+        
+        // финальный "колпачок" — яркий акцент
+        ctx.save();
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(trunkX, crownBaseY - 98, 26, 0, Math.PI * 2);
+        ctx.fillStyle = '#acf26e';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(trunkX - 4, crownBaseY - 104, 15, 0, Math.PI * 2);
+        ctx.fillStyle = '#caff8a';
+        ctx.fill();
+        ctx.restore();
+
+        // ----- 4. ДЕТАЛИ: СВЕТ И ТЕНЬ, ПЛОДЫ/ЖЕЛУДИ -----
+        // легкие блики на листве (солнечные зайчики)
+        ctx.fillStyle = '#f5ffc4';
+        for (let i = 0; i < 55; i++) {
+            ctx.beginPath();
+            const angleRand = Math.random() * Math.PI * 2;
+            const rad = 18 + Math.random() * 62;
+            const xOff = Math.cos(angleRand) * rad;
+            const yOff = Math.sin(angleRand) * rad * 0.7 - 30;
+            ctx.ellipse(trunkX + xOff, crownBaseY - 28 + yOff, 3 + Math.random() * 6, 2 + Math.random() * 4, 0, 0, Math.PI * 2);
+            ctx.fill();
         }
         
-        // КОЛЛИЗИИ (честные, с широкими проходами)
-        function checkCollisionsAndCollect() {
-            const playerBox = new THREE.Box3().setFromObject(player);
-            // Столкновения с трубами
-            for (let obs of obstacles) {
-                const obsBox = new THREE.Box3().setFromObject(obs);
-                if (playerBox.intersectsBox(obsBox)) {
-                    gameActive = false;
-                    endGame();
-                    return false;
-                }
-            }
-            // Сбор искр
-            for (let i=0; i<sparks.length; i++) {
-                const sparkBox = new THREE.Box3().setFromObject(sparks[i]);
-                if (playerBox.intersectsBox(sparkBox) && !sparks[i].userData.collected) {
-                    sparks[i].userData.collected = true;
-                    score++;
-                    document.getElementById('scoreValue').innerText = score;
-                    firePulse.intensity = 1.3;
-                    setTimeout(() => { if(gameActive) firePulse.intensity = 0.85; }, 130);
-                    scene.remove(sparks[i]);
-                    sparks.splice(i,1);
-                    i--;
-                }
-            }
-            return true;
+        // маленькие желуди / плоды (дуб)
+        for (let ac = 0; ac < 32; ac++) {
+            ctx.beginPath();
+            const angleAc = Math.random() * Math.PI * 2;
+            const radiusAc = 22 + Math.random() * 60;
+            const acX = trunkX + Math.cos(angleAc) * radiusAc;
+            const acY = crownBaseY - 15 + Math.sin(angleAc) * radiusAc * 0.8;
+            ctx.ellipse(acX, acY, 3 + Math.random() * 3, 4 + Math.random() * 3, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#bd8a47';
+            ctx.fill();
+            ctx.fillStyle = '#6d441c';
+            ctx.beginPath();
+            ctx.ellipse(acX - 1, acY - 1, 1.2, 1.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // ----- 5. ТРАВИНКИ И ЦВЕТЫ У ПОДНОЖЬЯ -----
+        ctx.lineWidth = 2;
+        for (let g = 0; g < 80; g++) {
+            ctx.beginPath();
+            const baseX = trunkX - 50 + Math.random() * 100;
+            const baseY = trunkBottomY + 3 + Math.random() * 24;
+            ctx.moveTo(baseX, baseY);
+            ctx.quadraticCurveTo(baseX + (Math.random() - 0.5) * 12, baseY - 14 + Math.random() * 12, baseX + (Math.random() - 0.5) * 8, baseY - 28);
+            ctx.strokeStyle = '#50862c';
+            ctx.stroke();
+        }
+        // полевые цветы
+        for (let f = 0; f < 45; f++) {
+            const fx = trunkX - 70 + Math.random() * 140;
+            const fy = trunkBottomY - 4 + Math.random() * 32;
+            ctx.beginPath();
+            ctx.arc(fx, fy, 3 + Math.random() * 4, 0, Math.PI * 2);
+            ctx.fillStyle = `hsl(${40 + Math.random() * 40}, 75%, 65%)`;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(fx - 1, fy - 1, 1.2, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffef99';
+            ctx.fill();
+        }
+
+        // ----- 6. ОБЪЕМ И ВОЗДУШНАЯ АТМОСФЕРА (легкие листочки) -----
+        ctx.fillStyle = '#aae67a';
+        for (let leaf = 0; leaf < 110; leaf++) {
+            ctx.beginPath();
+            let leafX = trunkX - 65 + Math.random() * 130;
+            let leafY = crownBaseY - 85 + Math.random() * 95;
+            ctx.ellipse(leafX, leafY, 2.5 + Math.random() * 5, 1.5 + Math.random() * 3, Math.random() * Math.PI, 0, Math.PI * 2);
+            ctx.fill();
         }
         
-        function endGame() {
-            gameActive = false;
-            document.getElementById('finalScore').innerText = score;
-            document.getElementById('gameOverPanel').style.display = 'flex';
-            if (score > bestScore) {
-                bestScore = score;
-                localStorage.setItem('fireBestBalanced', bestScore);
-                document.getElementById('bestValue').innerText = bestScore;
-            }
+        // падающий листик (для живости)
+        ctx.fillStyle = '#c9f07a';
+        ctx.beginPath();
+        ctx.ellipse(trunkX + 52, crownBaseY + 22, 5, 3, 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#90c05a';
+        ctx.beginPath();
+        ctx.ellipse(trunkX + 48, crownBaseY + 25, 4, 2.5, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // ----- 7. СОЛНЕЧНЫЙ СВЕТ (блики на кроне) -----
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.beginPath();
+        ctx.ellipse(trunkX - 18, crownBaseY - 74, 20, 14, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#fffab3';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(trunkX + 20, crownBaseY - 68, 16, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        // маленький лучик от солнца (лучистый эффект)
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        for (let ray = 0; ray < 12; ray++) {
+            ctx.beginPath();
+            const angle = (ray / 12) * Math.PI * 2;
+            const xR = trunkX - 28 + Math.cos(angle) * 48;
+            const yR = crownBaseY - 72 + Math.sin(angle) * 40;
+            ctx.moveTo(trunkX - 18, crownBaseY - 72);
+            ctx.lineTo(xR, yR);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#ffffbb';
+            ctx.stroke();
+        }
+        ctx.restore();
+        
+        // ----- 8. ФИНАЛЬНЫЙ ШТРИХ: СТВОЛОВАЯ КОРА (дорисовка) + мох -----
+        ctx.fillStyle = '#6c451e';
+        for (let m = 0; m < 45; m++) {
+            ctx.beginPath();
+            const mx = trunkX - 18 + Math.random() * 36;
+            const my = trunkTopY + 24 + Math.random() * 90;
+            ctx.ellipse(mx, my, 2 + Math.random() * 5, 1 + Math.random() * 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.fillStyle = '#8aa862';
+        for (let moss = 0; moss < 32; moss++) {
+            ctx.beginPath();
+            const mossX = trunkX - 24 + Math.random() * 48;
+            const mossY = trunkBottomY - 16 + Math.random() * 38;
+            ctx.ellipse(mossX, mossY, 3, 1.6, 0.2, 0, Math.PI * 2);
+            ctx.fill();
         }
         
-        // ОСНОВНОЙ ЛУП
-        function updateGame() {
-            if (!gameActive) return;
-            
-            // Физика с новыми параметрами прыжка (ниже и послушнее)
-            playerVelY += GRAVITY;
-            playerY += playerVelY;
-            if (playerY > CEILING_Y) { playerY = CEILING_Y; playerVelY = 0; }
-            if (playerY < GROUND_Y) { playerY = GROUND_Y; playerVelY = 0; }
-            player.position.y = playerY;
-            // анимация вращения в полёте
-            player.rotation.x = playerVelY * 1.2;
-            player.rotation.z = playerVelY * 0.7;
-            
-            // Движение всех объектов влево
-            obstacles.forEach(obs => obs.position.x -= SCROLL_SPEED);
-            sparks.forEach(sp => {
-                sp.position.x -= SCROLL_SPEED;
-                sp.children[0].rotation.y += 0.08;
-                sp.children[1].rotation.x += 0.06;
-            });
-            
-            // Удаление ушедших
-            obstacles = obstacles.filter(obs => {
-                if (obs.position.x < -4.0) { scene.remove(obs); return false; }
-                return true;
-            });
-            sparks = sparks.filter(sp => {
-                if (sp.position.x < -4.2) { scene.remove(sp); return false; }
-                return true;
-            });
-            
-            // Спавн новых препятствий
-            if (frameCounter - lastSpawnFrame > SPAWN_INTERVAL) {
-                lastSpawnFrame = frameCounter;
-                let newObs = createObstacleWide(5.2);
-                obstacles.push(newObs);
-                // генерируем 1-2 искры рядом
-                const sparkGenCount = Math.random() > 0.4 ? 1 : 2;
-                for (let s=0; s<sparkGenCount; s++) {
-                    let randY = -1.2 + Math.random() * 3.5;
-                    let sparkX = 5.2 + 0.7 + (s * 0.4);
-                    let newSpark = createSpark(sparkX, randY);
-                    sparks.push(newSpark);
-                }
-                if (Math.random() < 0.55) {
-                    let extraSpark = createSpark(5.5, -0.6 + Math.random() * 2.8);
-                    sparks.push(extraSpark);
-                }
-            }
-            
-            const safe = checkCollisionsAndCollect();
-            if (!safe) return;
-            frameCounter++;
-        }
+        // дополнительно блики на стволе (солнце)
+        ctx.beginPath();
+        ctx.moveTo(trunkX - 12, trunkTopY + 18);
+        ctx.lineTo(trunkX - 5, trunkTopY + 45);
+        ctx.lineTo(trunkX - 2, trunkTopY + 38);
+        ctx.fillStyle = '#e7b97a';
+        ctx.fill();
         
-        // ПРЫЖОК (теперь точный и не слишком высокий)
-        function performJump() {
-            if (!gameActive) return;
-            playerVelY = JUMP_FORCE;
-            cornerLights.forEach(light => { light.intensity = 1.0; setTimeout(() => { if(gameActive) light.intensity = 0.65; }, 180); });
-            firePulse.intensity = 1.15;
-            setTimeout(() => { if(gameActive) firePulse.intensity = 0.8; }, 200);
-        }
+        // тень от кроны на траве (мягкая)
+        ctx.fillStyle = '#486e2e';
+        ctx.globalAlpha = 0.27;
+        ctx.beginPath();
+        ctx.ellipse(trunkX + 6, trunkBottomY + 9, 68, 22, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
         
-        // Управление
-        window.addEventListener('click', () => { if (gameActive) performJump(); });
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (gameActive) performJump();
-            }
-        });
-        document.getElementById('startBtn').addEventListener('click', () => resetGame());
-        document.getElementById('restartBtn').addEventListener('click', () => resetGame());
-        
-        // --- ОКРУЖЕНИЕ: дым и пульсация ---
-        let envTimer = 0;
-        function animateEnvironment() {
-            envTimer += 0.02;
-            smokeSys.rotation.y += 0.0025;
-            smokeSys.rotation.x = Math.sin(envTimer * 0.18) * 0.08;
-            cornerLights.forEach((light, idx) => {
-                const intens = 0.55 + Math.sin(envTimer * 4.5 + idx) * 0.3;
-                light.intensity = intens;
-            });
-            firePulse.intensity = 0.7 + Math.sin(envTimer * 5) * 0.2;
-            starsField.rotation.y += 0.0005;
-            // Камера плавно следует
-            const targetY = playerY * 0.12;
-            camera.position.y += (targetY - camera.position.y) * 0.06;
-            camera.lookAt(0, playerY * 0.45 + 0.2, 0);
-        }
-        
-        // --- АНИМАЦИОННЫЙ ЦИКЛ ---
-        function animate() {
-            requestAnimationFrame(animate);
-            if (gameActive) updateGame();
-            animateEnvironment();
-            renderer.render(scene, camera);
-            labelRenderer.render(scene, camera);
-        }
-        
-        // Начальное состояние: меню
-        gameActive = false;
-        player.position.y = 0;
-        animate();
-    </script>
+        // добавим пару бабочек? нет, пусть будет реалистичное дерево.
+        // надпись мелким шрифтом
+        ctx.font = "italic 12px 'Segoe UI', cursive";
+        ctx.fillStyle = '#315d1a';
+        ctx.shadowBlur = 0;
+        ctx.fillText("🍂 могучий дуб", trunkX - 40, trunkBottomY + 34);
+    })();
+</script>
 </body>
 </html>
